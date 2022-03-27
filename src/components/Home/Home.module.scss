@@ -1,0 +1,64 @@
+@import '../../variables.scss';
+
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+}
+
+.title {
+    color: $primary_color;
+    text-shadow: 1px 2px 5px $primary_color;
+    -webkit-text-stroke: 2px $primary_color;
+    font-size: 80px;
+    font-family: $font_family;
+    cursor: default;
+    user-select: none;
+    text-decoration: underline;
+    animation: blinker 5s infinite;
+    transition: 200ms;
+
+    &:hover {
+        color: #222;
+    }
+}
+  
+@keyframes blinker {
+    50% {
+        transform: scale(1.05)
+    }
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+} 
+
+.option {
+    color: $primary_color;
+    font-size: 80px;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: $font_family;
+    -webkit-text-stroke: 1px $primary_color;
+    color: $primary_color;
+    
+    transition: all 150ms ease-out;
+
+    &:hover {
+        color: black;
+        transform: scale(1.1);
+        text-shadow:
+            3px 3px 0 $primary_color,
+            -1px -1px 0 $primary_color,  
+            1px -1px 0 $primary_color,
+            -1px 1px 0 $primary_color,
+            1px 1px 0 $primary_color;
+    }
+}
