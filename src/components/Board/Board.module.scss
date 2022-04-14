@@ -1,6 +1,8 @@
 .board {
+  position: relative;
   display: flex;
   flex-direction: column;
+  background-color: #111111dd;
 }
 
 .row {

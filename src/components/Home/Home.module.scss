@@ -12,8 +12,6 @@
 
 .title {
     color: $primary_color;
-    text-shadow: 1px 2px 5px $primary_color;
-    -webkit-text-stroke: 2px $primary_color;
     font-size: 80px;
     font-family: $font_family;
     cursor: default;
@@ -21,15 +19,12 @@
     text-decoration: underline;
     animation: blinker 5s infinite;
     transition: 200ms;
-
-    &:hover {
-        color: #222;
-    }
 }
   
 @keyframes blinker {
     50% {
-        transform: scale(1.05)
+        transform: scale(1.05);
+        text-shadow: 0 0 10px #fff, 0 0 15px $primary_color, 0 0 30px $primary_color;
     }
 }
 

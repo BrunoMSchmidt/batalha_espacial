@@ -1,0 +1,13 @@
+.square {
+  width: 65px;
+  height: 65px;
+  background-color: #ffffff10;
+  border: 1px solid #999;
+  color: #999;
+  display: grid;
+  place-items: center;
+
+  &:hover {
+    background-color: hsl(0, 48%, 30%);
+  }
+}

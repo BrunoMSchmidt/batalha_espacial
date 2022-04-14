@@ -3,9 +3,13 @@ import Game from '../Game/Game';
 import Home from '../Home/Home';
 import styles from './App.module.scss';
 
+
+
 function App() {
   const { container, title } = styles;
-  
+
+  console.log('App rendered.')
+
   return (
     <main className={container}>
       <HashRouter>
