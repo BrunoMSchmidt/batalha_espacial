@@ -13,7 +13,7 @@ function Home() {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>BATALHA ASTRAL</h1>
+      <h1 className={styles.title}>BATALHA ESPACIAL</h1>
       <div className={styles.options}>
         <Link to={"/game"} className={styles.option}>
           Jogar
