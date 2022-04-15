@@ -28,8 +28,6 @@ function createWindow() {
 
 app.on('ready', createWindow);
 
-app.on('bom-dia', () => console.log('teste'));
-
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
     // On OS X it is common for applications and their menu bar
@@ -48,7 +46,6 @@ function sair() {
 }
 
 ipcMain.on("toMain", (event, args) => {
-    console.log(args);
     if (args.funcao === "sair")
         sair();
 });

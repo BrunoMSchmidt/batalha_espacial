@@ -8,7 +8,7 @@ import styles from './App.module.scss';
 function App() {
   const { container, title } = styles;
 
-  console.log('App rendered.')
+  console.log('RENDER - App.')
 
   return (
     <main className={container}>

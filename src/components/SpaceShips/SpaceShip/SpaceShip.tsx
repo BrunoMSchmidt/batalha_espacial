@@ -14,7 +14,6 @@ const SpaceShip = memo(function SpaceShip({spaceShip, index, gameStateDispatcher
   let wait = false;
 
   const getInitialCoordinates = () => {
-    // console.log()
     if(spaceShip.x && spaceShip.y){
       return {x: spaceShip.x * 65, y: spaceShip.y *65};
     } else {
@@ -27,7 +26,6 @@ const SpaceShip = memo(function SpaceShip({spaceShip, index, gameStateDispatcher
 
   useEffect(() => {
     if(spaceShip.isOnBoard){
-      console.log('abd',{ x: (spaceShip.x || 0) * 65, y: (spaceShip.y || 0) * 65});
       setCoordinates({ x: (spaceShip.x || 0) * 65, y: (spaceShip.y || 0) * 65})
     } else {
       setCoordinates({ x: 0, y: 0});
@@ -61,23 +59,21 @@ const SpaceShip = memo(function SpaceShip({spaceShip, index, gameStateDispatcher
         }
         setIsDragging(true);
     
-        console.log(e);
         gameStateDispatcher({ type: 'SPACESHIP_START_MOVING', spaceShip }); 
     
-        console.log("ADICIONOU EVENTOS");
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
         break;
       case 2: // RIGHT CLICK
-        console.log('right');
-        gameStateDispatcher({ type: 'SPACESHIP_ROTATE', spaceShip }); 
+        if(!isDragging){
+          gameStateDispatcher({ type: 'SPACESHIP_ROTATE', spaceShip }); 
+        }
         break;
     }
     
   };
   
   const handleMouseUp = (e: MouseEvent) => {
-    console.log("LIMPOU EVENTOS");
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
     coords = {};
@@ -106,7 +102,6 @@ const SpaceShip = memo(function SpaceShip({spaceShip, index, gameStateDispatcher
     if (!wait && target && target.x && target.y) {
       // fire the event
       let position = {x: target.x + 65/2 , y: target.y + 65/2};
-      // console.log(position);
       gameStateDispatcher({type: 'SPACESHIP_MOVE', position , spaceShip})
       // stop any further events
       wait = true;

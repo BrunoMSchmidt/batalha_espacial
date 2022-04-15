@@ -7,3 +7,11 @@ export type spaceShip = {
   vertical: boolean,
   isOnBoard: boolean
 }
+
+export type SquareType = {
+  x: number,
+  y: number,
+  value: number,
+  highlight: boolean,
+  occupied: boolean
+}

@@ -4,6 +4,10 @@ import "./index.scss";
 
 import App from "./components/App/App";
 
+import { enableAllPlugins } from "immer";
+
+enableAllPlugins();
+
 ReactDOM.render(
   <React.StrictMode>
       <App />

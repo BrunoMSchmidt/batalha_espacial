@@ -1,9 +1,10 @@
-import { useReducer, useState } from "react";
+import { useReducer } from "react";
 import { Link } from "react-router-dom";
 import * as gameHelper from "../../utils/gameHelper";
 import SpaceShips from "../SpaceShips/SpaceShips";
-import { spaceShip } from "../../types/types";
+import { spaceShip, SquareType } from "../../types/types";
 import Board from "../Board/Board";
+import produce from "immer"
 
 function gameStateReducer(state: any, action: any) {
   switch (action.type) {
@@ -14,7 +15,6 @@ function gameStateReducer(state: any, action: any) {
     case "SPACESHIP_DROP":
       return onSpaceShipDrop(state, action.position, action.spaceShip);
     case "SPACESHIP_ROTATE":
-      console.log('right 2')
       return onSpaceShipRotate(state, action.spaceShip);
     default:
       throw new Error();
@@ -44,9 +44,8 @@ const getSquareByCoordinates = (
 };
 
 const onSpaceShipStartMoving = (state: any, spaceShip: any) => {
-  const { board, spaceShips } = state;
-  updateOccupiedSquares(board, spaceShips, spaceShip);
-  return {board, spaceShips };
+  let board = updateOccupiedSquares(state.board, state.spaceShips, spaceShip);
+  return { board, spaceShips: state.spaceShips };
 }
 
 const onSpaceShipDrop = (
@@ -60,43 +59,65 @@ const onSpaceShipDrop = (
   if (squareCoordinates) {
     const { x, y } = squareCoordinates;
 
-    let spaceShips = prevSpaceShips.map((prevSpaceShip: any) => {
-      if (prevSpaceShip.id === spaceShip.id) {
-        return { ...prevSpaceShip, x, y, isOnBoard: true };
-      } else {
-        return prevSpaceShip;
-      }
-    });
-    let board = prevBoard.map((row: any, i: any) => row.map((square: any, j: any) => {
-      let auxSquare = square;
-      if(auxSquare.occupied){
-        auxSquare = {...auxSquare, occupied: false}
-      }
-      if(auxSquare.highlight){
-        auxSquare = {...square, highlight: false};
-      } 
-      return auxSquare;
-    }));
+    let { start, end } = getStartAndEndCoordinates(x, y, spaceShip.size, spaceShip.vertical);
 
-    updateOccupiedSquares(board, spaceShips)
-
-    const obj = {
-      board,
-      spaceShips
+    let canDrop = true;
+    for(let i = start.x; i <= end.x; i++) {
+      for(let j = start.y; j <= end.y; j++){
+        if(prevBoard[j][i].occupied){
+          canDrop = false;
+        }
+      }
     }
-  
-    return obj;
-  } else {
-    let board = [...prevBoard];
-    let spaceShips = prevSpaceShips.map((prevSpaceShip: any) => {
-      if (prevSpaceShip.id === spaceShip.id) {
-        return { ...prevSpaceShip, x: null, y: null, isOnBoard: false };
-      } else {
-        return prevSpaceShip;
-      }
-    });
 
-    updateOccupiedSquares(board, spaceShips);
+    if(canDrop){
+      let spaceShips = produce(prevSpaceShips, (draftSpaceShips: any) => {
+        let spaceShipToUpdate = draftSpaceShips.find((draftSpaceShip: any) => draftSpaceShip.id === spaceShip.id);
+        spaceShipToUpdate.isOnBoard = true;
+        spaceShipToUpdate.x = start.x;
+        spaceShipToUpdate.y = start.y;
+      })
+  
+      let board = produce(prevBoard, (draftBoard: any) => {
+        draftBoard.forEach((row: any) => row.forEach((square: any) => {
+          square.occupied = false
+          square.highlight = false
+        }))
+      }) 
+  
+      board = updateOccupiedSquares(board, spaceShips)
+    
+      return {board, spaceShips};
+    } else {
+      let spaceShips = produce(prevSpaceShips, (draftSpaceShips: any) => {
+        let spaceShipToUpdate = draftSpaceShips.find((draftSpaceShip: any) => draftSpaceShip.id === spaceShip.id);
+        spaceShipToUpdate.isOnBoard = false;
+        spaceShipToUpdate.x = null;
+        spaceShipToUpdate.y = null;
+      })
+  
+      let board = produce(prevBoard, (draftBoard: any) => {
+        draftBoard.forEach((row: any) => row.forEach((square: any) => {
+          square.occupied = false
+          square.highlight = false
+        }))
+      }) 
+
+      board = updateOccupiedSquares(board, spaceShips);
+      return {
+        board,
+        spaceShips
+      };
+    }
+  } else {
+    let spaceShips = produce(prevSpaceShips, (draftSpaceShips: any) => {
+      let spaceShipToUpdate = draftSpaceShips.find((draftSpaceShip: any) => draftSpaceShip.id === spaceShip.id);
+      spaceShipToUpdate.isOnBoard = false;
+      spaceShipToUpdate.x = null;
+      spaceShipToUpdate.y = null;
+    })
+
+    let board = updateOccupiedSquares(prevBoard, spaceShips);
     return {
       board,
       spaceShips
@@ -105,30 +126,47 @@ const onSpaceShipDrop = (
 };
 
 const updateOccupiedSquares = (board: any, spaceShips: any, exception?: spaceShip) => {
-  for(let i = 0; i <= 9; i++){
-    for(let j = 0; j <= 9; j++){
-      if(board[i][j].occupied){
-        board[i][j] = { ...board[i][j], occupied: false };
+  return produce(board, (draftBoard: any) => {
+    for(let i = 0; i <= 9; i++){
+      for(let j = 0; j <= 9; j++){
+        if(draftBoard[i][j].occupied){
+          draftBoard[i][j] = { ...draftBoard[i][j], occupied: false };
+        }
       }
     }
-  }
-  spaceShips.filter(({isOnBoard, id}: spaceShip) => isOnBoard && (exception ? id !== exception.id : true)).forEach(({id, vertical, x, y, size}: spaceShip) => {
-    if(x === null || y === null) return;
 
-    if(vertical){
-      for(let i = x; i < x + size; i++){
-        if(i < 10 && y < 10){
-          board[y][i] = {...board[y][i], occupied: true}
+    spaceShips.filter(({isOnBoard, id}: spaceShip) => isOnBoard && (exception ? id !== exception.id : true)).forEach(({id, vertical, x, y, size}: spaceShip) => {
+      if(x === null || y === null) return;
+      
+      if(vertical){
+        for(let i = x; i < x + size; i++){
+          if(i < 10 && y < 10){
+            draftBoard[y][i] = {...draftBoard[y][i], occupied: id}
+          }
+        }
+      } else {
+        for(let i = y; i < y + size; i++){
+          if(i < 10 && x < 10){
+            draftBoard[i][x] = {...draftBoard[i][x], occupied: id}
+          }
         }
       }
-    } else {
-      for(let i = y; i < y + size; i++){
-        if(i < 10 && x < 10){
-          board[i][x] = {...board[i][x], occupied: true}
-        }
-      }
-    }
+    })
   })
+}
+
+const getStartAndEndCoordinates = (x: number, y: number, size: number, vertical: boolean) => {
+  let start = {x, y};
+  let end = {x, y}
+  if(vertical){
+    start.x = x >= (10 - size) ? (10 - size) : x;
+    end.x = Math.min(9, x + size - 1);
+  } else {
+    start.y = y >= (10 - size) ? (10 - size) : y;
+    end.y = Math.min(9, y + size - 1);
+  }
+
+  return { start, end };
 }
 
 const onSpaceShipMove = (
@@ -147,25 +185,25 @@ const onSpaceShipMove = (
   if (squareCoordinate) {
     const { x, y } = squareCoordinate;
 
-    let arr = [];
-    for (let i = 0; i < board.length; i++) {
-      let row = [];
-      for (let j = 0; j < board[i].length; j++) {
-        if (
-          spaceShip.vertical
-            ? i === y && j >= x && j < x + spaceShip.size
-            : i >= y && i < y + spaceShip.size && j === x
-        ) {
-          console.log('entrou');
-          row.push({ ...board[i][j], highlight: true });
-        } else {
-          row.push({ ...board[i][j], highlight: false });
+    
+    let nextBoard = produce(board, (draftBoard: SquareType[][]) => {
+      
+      let { start, end } = getStartAndEndCoordinates(x, y, spaceShip.size, spaceShip.vertical);
+
+      for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+          if (
+            j >= start.x && j <= end.x && i >= start.y && i <= end.y
+          ) {
+            draftBoard[i][j].highlight = true;
+          } else {
+            draftBoard[i][j].highlight = false;
+          }
         }
       }
-      arr.push(row);
-    }
+    })
 
-    return { ...state, board: arr };
+    return { ...state, board: nextBoard };
   } else {
     if (board.some((row: any) => row.some((square: any) => square.highlight))) {
       let arr = [];
@@ -183,18 +221,31 @@ const onSpaceShipMove = (
 };
 
 const onSpaceShipRotate = (state: any, spaceShip: any) => {
-  return (
-    {
-      ...state,
-      spaceShips: state.spaceShips.map((prevSpaceShip: any) => {
-        if(prevSpaceShip.id === spaceShip.id){
-          return {...prevSpaceShip, vertical: !prevSpaceShip.vertical}
-        } else {
-          return prevSpaceShip
+
+  let board: any = updateOccupiedSquares(state.board, state.spaceShips, spaceShip);
+
+  let canDrop = true;
+  
+  if(spaceShip.isOnBoard){
+    let { start, end } = getStartAndEndCoordinates(spaceShip.x, spaceShip.y, spaceShip.size, !spaceShip.vertical);
+    
+    for(let i = start.x; i <= end.x; i++) {
+      for(let j = start.y; j <= end.y; j++){
+        if(board[j][i].occupied){
+          canDrop = false;
         }
-      })
+      }
     }
-  )
+  }
+    
+  return produce(state, (draftState: any) => {
+    let spaceShipToUpdate = draftState.spaceShips.find((draftSpaceShip: any) => draftSpaceShip.id === spaceShip.id);
+    if(canDrop) {
+      spaceShipToUpdate.vertical = !spaceShipToUpdate.vertical;
+    }
+
+    draftState.board = updateOccupiedSquares(draftState.board, draftState.spaceShips);
+  })
 }
 
 function Game() {
@@ -203,7 +254,6 @@ function Game() {
     gameHelper.getGameInitialState()
   );
 
-  console.log(`RENDER - Game.`);
   return (
     <div>
       <h1>Jogo</h1>
