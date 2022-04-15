@@ -236,16 +236,27 @@ const onSpaceShipRotate = (state: any, spaceShip: any) => {
         }
       }
     }
+
+    return produce(state, (draftState: any) => {
+      let spaceShipToUpdate = draftState.spaceShips.find((draftSpaceShip: any) => draftSpaceShip.id === spaceShip.id);
+      if(canDrop) {
+        spaceShipToUpdate.vertical = !spaceShipToUpdate.vertical;
+        spaceShipToUpdate.x = start.x;
+        spaceShipToUpdate.y = start.y;
+      }
+  
+      draftState.board = updateOccupiedSquares(draftState.board, draftState.spaceShips);
+    })
+  } else {
+    return produce(state, (draftState: any) => {
+      let spaceShipToUpdate = draftState.spaceShips.find((draftSpaceShip: any) => draftSpaceShip.id === spaceShip.id);
+      if(canDrop) {
+        spaceShipToUpdate.vertical = !spaceShipToUpdate.vertical;
+      }
+    });
   }
     
-  return produce(state, (draftState: any) => {
-    let spaceShipToUpdate = draftState.spaceShips.find((draftSpaceShip: any) => draftSpaceShip.id === spaceShip.id);
-    if(canDrop) {
-      spaceShipToUpdate.vertical = !spaceShipToUpdate.vertical;
-    }
-
-    draftState.board = updateOccupiedSquares(draftState.board, draftState.spaceShips);
-  })
+  
 }
 
 function Game() {
