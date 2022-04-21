@@ -185,7 +185,6 @@ const onSpaceShipMove = (
   if (squareCoordinate) {
     const { x, y } = squareCoordinate;
 
-    
     let nextBoard = produce(board, (draftBoard: SquareType[][]) => {
       
       let { start, end } = getStartAndEndCoordinates(x, y, spaceShip.size, spaceShip.vertical);

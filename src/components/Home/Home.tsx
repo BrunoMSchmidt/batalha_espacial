@@ -18,9 +18,12 @@ function Home() {
         <Link to={"/game"} className={styles.option}>
           Jogar
         </Link>
-        <div className={styles.option} onClick={quitApp}>
+        <Link to={"/config"} className={styles.option}>
+          Configurações
+        </Link>
+        <Link to={'.'} onClick={quitApp} className={styles.option}>
           Sair
-        </div>
+        </Link>
       </div>
     </div>
   );
