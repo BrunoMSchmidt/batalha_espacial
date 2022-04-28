@@ -1,3 +1,5 @@
+@import '../../variables.scss';
+
 .board {
   display: flex;
   flex-direction: column;
@@ -7,3 +9,44 @@
   display: flex;
   color: white;
 }
+
+.title {
+  color: $primary_color;
+  font-size: 40px;
+  text-decoration: none;
+  font-family: $font_family;
+  -webkit-text-stroke: 1px $primary_color;
+  color: $primary_color;
+  text-align: center;
+}
+
+.option {
+  color: $primary_color;
+  font-size: 50px;
+  text-decoration: none;
+  font-family: $font_family;
+  -webkit-text-stroke: 1px $primary_color;
+  color: $primary_color;
+  text-align: center;
+  cursor: pointer;
+
+  transition: all 150ms ease-out;
+
+  &.disabled {
+    filter: opacity(.5) brightness(.7);
+    cursor: pointer;
+    pointer-events: none;
+  }
+
+  &:not(.disabled):hover {
+    color: black;
+    transform: scale(1.1);
+    text-shadow:
+      3px 3px 0 $primary_color,
+      -1px -1px 0 $primary_color,  
+      1px -1px 0 $primary_color,
+      -1px 1px 0 $primary_color,
+      1px 1px 0 $primary_color;
+  }
+}
+

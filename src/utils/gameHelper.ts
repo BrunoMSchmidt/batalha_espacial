@@ -7,60 +7,22 @@ import img4 from "../assets/images/spaceships/4.svg";
 import img5 from "../assets/images/spaceships/5.svg";
 import { nanoid } from "nanoid";
 
-const spaceShips: spaceShip[] = [
-  {
-    id: nanoid(),
-    size: 1,
-    src: img1,
-    x: null,
-    y: null,
-    vertical: false,
-    isOnBoard: false,
-  },
-  {
-    id: nanoid(),
-    size: 2,
-    src: img2,
-    x: null,
-    y: null,
-    vertical: false,
-    isOnBoard: false,
-  },
-  {
-    id: nanoid(),
-    size: 3,
-    src: img3,
-    x: null,
-    y: null,
-    vertical: false,
-    isOnBoard: false,
-  },
-  {
-    id: nanoid(),
-    size: 4,
-    src: img4,
-    x: null,
-    y: null,
-    vertical: false,
-    isOnBoard: false,
-  },
-  {
-    id: nanoid(),
-    size: 5,
-    src: img5,
-    x: null,
-    y: null,
-    vertical: false,
-    isOnBoard: false,
-  },
-];
+const images = [img1, img2, img3, img4, img5];
 
 export function getSpaceShip(size: number): spaceShip {
   if (!size || size < 1 || size > 5) {
     throw new Error("Incorrect size for spaceship");
   }
 
-  return spaceShips[size - 1];
+  return {
+    id: nanoid(),
+    size: size,
+    src: images[size - 1],
+    x: null,
+    y: null,
+    vertical: false,
+    isOnBoard: false
+  };
 }
 
 export const getBoardInitialState = () => {
@@ -77,15 +39,26 @@ export const getBoardInitialState = () => {
 
 export const getSpaceShipsInitialState = () => {
   const arr: spaceShip[] = [];
-  for (let i = 1; i <= 5; i++) {
-    arr.push(getSpaceShip(i));
+  const sizes = [2, 3, 3, 4, 5];
+  for(const size of sizes){
+    arr.push(getSpaceShip(size));
   }
+
+  console.log("NOVO", arr);
   return arr;
 };
 
 export const getGameInitialState: any = () => {
   return {
-    board: getBoardInitialState(),
-    spaceShips: getSpaceShipsInitialState(),
+    player1: {
+      board: getBoardInitialState(),
+      spaceShips: getSpaceShipsInitialState(),
+    },
+    player2: {
+      board: getBoardInitialState(),
+      spaceShips: getSpaceShipsInitialState(),
+    },
+    turn: 'player1',
+    gameStarted: false
   };
 };

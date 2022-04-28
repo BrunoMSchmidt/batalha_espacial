@@ -1,5 +1,6 @@
 import { spaceShip } from "../../types/types"
 import SpaceShip from "./SpaceShip/SpaceShip";
+import style from "./SpaceShips.module.scss";
 
 type SpaceShipProps = {
   spaceShips: spaceShip[],
@@ -8,10 +9,11 @@ type SpaceShipProps = {
 
 function SpaceShips({spaceShips, gameStateDispatcher}: SpaceShipProps){
 
+
   console.log('RENDER - Spaceships.');
 
   return (
-    <div className="spaceships">
+    <div className={style.spaceships}>
       {spaceShips.filter(spaceShip => !spaceShip.isOnBoard).map((spaceShip, index) => (
         <SpaceShip key={spaceShip.id} gameStateDispatcher={gameStateDispatcher} spaceShip={spaceShip} index={index} />
       ))}  
