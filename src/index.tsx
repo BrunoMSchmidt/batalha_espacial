@@ -1,16 +1,15 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.scss";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.scss';
 
-import App from "./components/App/App";
-
-import { enableAllPlugins } from "immer";
+import { enableAllPlugins } from 'immer';
+import App from './components/App/App';
 
 enableAllPlugins();
 
 ReactDOM.render(
   <React.StrictMode>
-      <App />
+    <App />
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root'),
 );

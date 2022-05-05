@@ -4,17 +4,19 @@ import styles from './Square.module.scss';
 
 type SquareProps = SquareType & {};
 
-const Square = memo(function Square({x, y, value, highlight, occupied}: SquareProps){
+const Square = memo(({
+  x, y, value, highlight, occupied,
+}: SquareProps) => {
   const style = {
     backgroundColor: highlight ? occupied ? 'red' : 'green' : 'transparent',
-    overflow: 'hidden'
-  }
+    overflow: 'hidden',
+  };
 
   return (
     <div className={`droppable ${styles.square}`} style={style}>
       {/* {occupied} */}
     </div>
-  )
-})
+  );
+});
 
 export default Square;

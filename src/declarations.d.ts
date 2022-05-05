@@ -1,9 +1,9 @@
-declare module "*.scss" {
+declare module '*.scss' {
     const content: any;
     export = content;
 }
 
-declare module "*.svg" {
+declare module '*.svg' {
     const content: any;
     export = content;
 }
