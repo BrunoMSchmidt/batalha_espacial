@@ -1,7 +1,7 @@
 {
   "name": "batalha_astral",
   "description": "Um jogo no clássico \"batalha naval\"",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "author": {
     "name": "Bruno Marlon Schmidt",
@@ -19,7 +19,6 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "electron": "^18.0.4",
     "concurrently": "^7.1.0",
     "cross-env": "^7.0.3",
     "electron-is-dev": "^2.0.0",
@@ -36,6 +35,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "electron": "^18.0.4",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.0.1",
     "@testing-library/user-event": "^14.1.0",
@@ -44,15 +44,7 @@
     "@types/react": "^18.0.5",
     "@types/react-dom": "^18.0.1",
     "@types/sass": "^1.43.1",
-    "@typescript-eslint/eslint-plugin": "^5.22.0",
-    "@typescript-eslint/parser": "^5.22.0",
-    "electron-builder": "^23.0.3",
-    "eslint": "^8.14.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsx-a11y": "^6.5.1",
-    "eslint-plugin-react": "^7.29.4",
-    "eslint-plugin-react-hooks": "^4.5.0"
+    "electron-builder": "^23.0.3"
   },
   "main": "public/main.ts",
   "homepage": "./",
@@ -65,8 +57,7 @@
     "release": "npm run build && electron-builder --linux --win --mac --x64 --ia32 --publish never",
     "build": "npm run react-build && npm run electron-build -- -p never",
     "publish": "npm run react-build && npm run electron-build -- -p always",
-    "start": "concurrently -k \"cross-env BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron . \"",
-    "lint": "eslint \"**/*.{j,t}s\""
+    "start": "concurrently -k \"cross-env BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron . \""
   },
   "build": {
     "extends": null,
@@ -80,12 +71,6 @@
     "directories": {
       "buildResources": "assets"
     }
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
