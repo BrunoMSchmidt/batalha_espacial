@@ -46,7 +46,7 @@
     "@types/sass": "^1.43.1",
     "electron-builder": "^23.0.3"
   },
-  "main": "public/main.ts",
+  "main": "./public/main.ts",
   "homepage": "./",
   "scripts": {
     "react-start": "react-scripts start",
@@ -62,15 +62,17 @@
   "build": {
     "extends": null,
     "appId": "com.unoesc.batalha_astral",
-    "files": [
-      "dist/**/*",
-      "build/**/*",
-      "node_modules/**/*",
-      "package.json"
-    ],
-    "directories": {
-      "buildResources": "assets"
-    }
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "publish": [
+      {
+        "provider": "github"
+      }
+    ]
   },
   "browserslist": {
     "production": [
