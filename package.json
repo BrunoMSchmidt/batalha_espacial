@@ -1,7 +1,7 @@
 {
   "name": "batalha_astral",
   "description": "Um jogo no clássico \"batalha naval\"",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "author": {
     "name": "Bruno Marlon Schmidt",
@@ -46,22 +46,31 @@
     "@types/sass": "^1.43.1",
     "electron-builder": "^23.0.3"
   },
-  "main": "./public/main.ts",
+  "main": "public/main.ts",
   "homepage": "./",
   "scripts": {
     "react-start": "react-scripts start",
     "react-build": "react-scripts build",
     "react-test": "react-scripts test --env=jsdom",
     "react-eject": "react-scripts eject",
-    "electron-build": "electron-builder",
+    "electron-build": "electron-builder -c.extraMetadata.main=build/main.ts",
     "release": "npm run build && electron-builder --linux --win --mac --x64 --ia32 --publish never",
     "build": "npm run react-build && npm run electron-build -- -p never",
     "publish": "npm run react-build && npm run electron-build -- -p always",
-    "start": "concurrently -k \"cross-env BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron . \""
+    "start": "concurrently -k \"cross-env BROWSER=none npm run react-start\" \"wait-on http://localhost:3000 && electron . \""
   },
   "build": {
     "extends": null,
     "appId": "com.unoesc.batalha_astral",
+    "files": [
+      "dist/**/*",
+      "build/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
     "linux": {
       "target": [
         "AppImage",
