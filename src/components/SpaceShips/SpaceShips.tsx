@@ -1,21 +1,22 @@
-import { spaceShip } from '../../types/types';
-import SpaceShip from './SpaceShip/SpaceShip';
-import style from './SpaceShips.module.scss';
+import { useContext } from 'react';
+import GameContext from '../../contexts/GameContext';
+import { SpaceShip as SpaceShipType } from '../../types/types';
+import SpaceShip from '../SpaceShip/SpaceShip';
+import { StyledSpaceShips } from "./SpaceShips.styled";
 
-type SpaceShipProps = {
-  spaceShips: spaceShip[],
-  gameStateDispatcher: Function
-}
-
-function SpaceShips({ spaceShips, gameStateDispatcher }: SpaceShipProps) {
+function SpaceShips() {
   console.log('RENDER - Spaceships.');
 
+  const [game] = useContext(GameContext);
+
+  const spaceShips = game[game.turn].spaceShips;
+
   return (
-    <div className={style.spaceships}>
-      {spaceShips.filter((spaceShip) => !spaceShip.isOnBoard).map((spaceShip, index) => (
-        <SpaceShip key={spaceShip.id} gameStateDispatcher={gameStateDispatcher} spaceShip={spaceShip} index={index} />
+    <StyledSpaceShips>
+      {spaceShips.filter((spaceShip: any) => !spaceShip.isOnBoard).map((spaceShip: any, index: number) => (
+        <SpaceShip key={spaceShip.id} spaceShip={spaceShip} index={index} />
       ))}
-    </div>
+    </StyledSpaceShips>
   );
 }
 

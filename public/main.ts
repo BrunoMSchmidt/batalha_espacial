@@ -2,9 +2,12 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 
 const path = require('path');
 const isDev = require('electron-is-dev');
+const fs = require ('fs');
+const os = require('os');
 
+let mainWindow;
 function createWindow() {
-  let win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1200,
     height: 720,
     webPreferences: {
@@ -13,18 +16,18 @@ function createWindow() {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.ts'),
     },
-    fullscreen: true,
-    frame: false,
+    fullscreen: false, // true
+    frame: true,
   });
 
-  win.loadURL(
+  mainWindow.loadURL(
     isDev
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`,
   );
 
-  win.on('closed', () => {
-    win = null;
+  mainWindow.on('closed', () => {
+    mainWindow = null;
   });
 }
 
@@ -47,6 +50,42 @@ function sair() {
   app.quit();
 }
 
+function saveConfig(config) {
+  const folderPath = path.join(os.tmpdir(), 'batalha_espacial');
+  const filePath = path.join(folderPath, 'config.json');
+  if(!fs.existsSync(folderPath)){
+    fs.mkdirSync(folderPath, { recursive: true });
+  }
+
+  console.log(config);
+
+  const dataToSave = JSON.stringify(config);
+  fs.writeFile(filePath, dataToSave, (err) => {
+    if(err) {
+      mainWindow.webContents.send("fromMain", { success: false, message: err });
+    } else {
+      mainWindow.webContents.send("fromMain", { success: true });
+    }
+  });
+
+}
+
+function getConfig() {
+  const configPath = path.join(os.tmpdir(), 'batalha_espacial', 'config.json');
+  fs.readFile(configPath, (err, data) => {
+    if(err){
+      mainWindow.webContents.send("fromMain", { success: false, message: err });
+    } else {
+      const jsonString = Buffer.from(data).toString('utf8')
+      const parsedData = JSON.parse(jsonString)
+
+      mainWindow.webContents.send("fromMain", { success: true, result: parsedData });
+    }
+  })
+}
+
 ipcMain.on('toMain', (event, args) => {
   if (args.funcao === 'sair') sair();
+  if (args.funcao === 'getConfig') getConfig();
+  if (args.funcao === 'saveConfig') saveConfig(args.config);
 });

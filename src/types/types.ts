@@ -1,17 +1,31 @@
-export type spaceShip = {
+export type SpaceShip = {
   id: string,
   size: number,
   src: string,
   x: number | null,
   y: number | null,
-  vertical: boolean,
+  horizontal: boolean,
   isOnBoard: boolean
 }
 
-export type SquareType = {
-  x: number,
-  y: number,
-  value: number,
+export type Square = {
   highlight: boolean,
-  occupied: boolean
+  occupied: string | null,
+  clicked: boolean,
+  destroyed: boolean
+}
+
+export type GameState = {
+  player1: {
+    board: Square[][],
+    spaceShips: SpaceShip[],
+  },
+  player2: {
+    board: Square[][],
+    spaceShips: SpaceShip[]
+  },
+  turn: 'player1' | 'player2',
+  gameStarted: boolean,
+  gameFinished: boolean,
+  turnFinished: boolean
 }

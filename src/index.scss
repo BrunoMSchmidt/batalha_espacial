@@ -1,5 +1,21 @@
+@font-face {
+  font-family: 'Star Jedi';
+  src: URL('./assets/fonts/Starjedi.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Bungee';
+  src: URL('./assets/fonts/Bungee.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: URL('./assets/fonts/Poppins.ttf') format('truetype');
+}
+
 * {
   box-sizing: border-box;
+  font-family: 'Star Jedi';
 }
 
 body {

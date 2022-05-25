@@ -1,24 +1,30 @@
 import {
-  HashRouter, Route, Routes,
+  HashRouter, Route, Routes, useLocation,
 } from 'react-router-dom';
+import { ConfigurationContextProvider } from '../../contexts/ConfigurationContext';
 import Game from '../Game/Game';
 import Home from '../Home/Home';
-import styles from './App.module.scss';
+import { StyledContainer } from "./App.styled";
+import {SoundContextProvider} from "../../contexts/SoundContext";
+import { Configuration } from '../Configuration/Configuration';
 
 function App() {
-  const { container, title } = styles;
-
   console.log('RENDER - App.');
 
   return (
-    <main className={container}>
-      <HashRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/game" element={<Game />} />
-        </Routes>
-      </HashRouter>
-    </main>
+    <StyledContainer>
+      <ConfigurationContextProvider>
+        <SoundContextProvider>
+          <HashRouter>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/game" element={<Game />} />
+              <Route path="/config" element={<Configuration />} />
+            </Routes>
+          </HashRouter>
+        </SoundContextProvider>
+      </ConfigurationContextProvider>
+    </StyledContainer>
   );
 }
 
