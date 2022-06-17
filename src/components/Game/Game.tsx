@@ -1,68 +1,113 @@
-import {Link} from 'react-router-dom';
-import * as gameHelper from '../../utils/gameHelper';
-import SpaceShips from '../SpaceShips/SpaceShips';
-import Board from '../Board/Board';
-import GameContext from '../../contexts/GameContext';
-import {useImmerReducer} from 'use-immer';
-import { gameStateReducer } from '../../reducers/GameReducer'
-import { StyledOption, StyledContainer, StyledBoardWrapper, StyledTitle} from "./Game.styled";
-import {useContext, useEffect} from "react";
-import {SoundContext} from "../../contexts/SoundContext";
+import { useNavigate, useParams } from "react-router-dom";
+import * as gameHelper from "../../utils/gameHelper";
+import SpaceShips from "../SpaceShips/SpaceShips";
+import Board from "../Board/Board";
+import {
+  GameStateContext,
+  GameDispatcherContext,
+} from "../../contexts/GameContext";
+import {
+  StyledBackWrapper,
+  StyledBoardWrapper,
+  StyledContainer,
+  StyledOption,
+  StyledTitle,
+} from "./Game.styled";
+import { useContext, useEffect } from "react";
+import { SoundContext } from "../../contexts/SoundContext";
+import Modal from "@mui/material/Modal";
+import GameResult from "../GameResult/GameResult";
+import { Fade, Tooltip } from "@mui/material";
+import { ArrowBack } from "@mui/icons-material";
 
 function Game() {
-    const [game, gameStateDispatcher] = useImmerReducer(gameStateReducer, gameHelper.getGameInitialState());
+  const navigate = useNavigate();
 
-    const canClickOnOption = game.gameStarted ? game.turnFinished : game[game.turn].spaceShips.every((spaceShip: any) => spaceShip.isOnBoard);
+  const game = useContext(GameStateContext);
+  const gameStateDispatcher = useContext(GameDispatcherContext);
 
-    const {playAudio, stopAudio} = useContext(SoundContext);
+  const canClickOnOption = game.gameStarted
+    ? game.turnFinished
+    : game[game.turn].spaceShips.every((spaceShip: any) => spaceShip.isOnBoard);
 
-    useEffect(() => {
-        stopAudio('preGameSoundtrack')
+  const { playAudio, stopAudio } = useContext(SoundContext);
 
-        return () => {
-            playAudio('preGameSoundtrack')
-        }
-    }, []);
+  useEffect(() => {
+    stopAudio("preGameSoundtrack");
 
-    const onOptionClick = () => {
-        gameStateDispatcher({type: 'CHANGE_TURN'} );
-        if(game.turn == "player2" && !game.gameStarted) {
-            gameStateDispatcher({type: 'START_GAME'});
-        }
+    return () => {
+      playAudio("preGameSoundtrack");
+    };
+  }, []);
+
+  useEffect(() => {
+    if(game && game.gameStarted && game.opponent == "computer" && game.turn == "player2" && !game.gameWon && game.turnFinished == false){
+      setTimeout(() => {
+        handleAiPlay();
+      }, 500);
     }
+  })
 
-    const getOptionText = () => {
-        return (
-            !game.gameStarted
-                ? game.turn == "player2"
-                    ? "Start"
-                    : "READY"
-                : "NEXT"
-        )
+  const handleAiPlay = () => {
+    gameStateDispatcher({ type: "AI_PLAY"});
+  }
+
+  const onOptionClick = () => {
+    gameStateDispatcher({ type: "CHANGE_TURN" });
+    if (game.turn == "player2" && !game.gameStarted) {
+      gameStateDispatcher({ type: "START_GAME" });
     }
+  };
 
-    const getTitleText = () => {
-        return `${game.turn === 'player1' ? 'Player 1' : 'Player 2'}${game.gameStarted ? ' turn' : ''}`;
-    }
+  const getOptionText = () => {
+    return !game.gameStarted
+      ? game.turn == "player2"
+        ? "Start"
+        : "READY"
+      : "NEXT";
+  };
 
-    return (
-        <GameContext.Provider value={[game, gameStateDispatcher]}>
-            <StyledContainer>
-                <StyledTitle>{getTitleText()}</StyledTitle>
-                <StyledBoardWrapper>
-                    <Board/>
-                    {!game.gameStarted && <SpaceShips/>}
-                </StyledBoardWrapper>
-                <StyledOption disabled={!canClickOnOption}
-                    onClick={onOptionClick}>
-                    {
-                       getOptionText()
-                    }
-                </StyledOption>
-                <Link to="../">Back</Link>
-            </StyledContainer>
-        </GameContext.Provider>
-    );
+  const getTitleText = () => {
+    return `Vez do ${game.turn === "player1" ? "Jogador 1" : `${game.opponent == "computer" ? "Computador" : "Jogador 2"}`}`;
+  };
+
+  const navigateBack = () => {
+    navigate('../');
+  }
+
+  return (
+    <>
+      <Modal 
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={!!game.gameWon}
+        closeAfterTransition                
+      >
+        <>
+          <GameResult player={game.turn}></GameResult>
+        </>
+      </Modal>
+      <Fade in={true}>
+        <StyledContainer>
+          <Tooltip title="Voltar">
+            <StyledBackWrapper
+              onClick={navigateBack}
+            >
+              <ArrowBack htmlColor="orange" fontSize="large"></ArrowBack>
+            </StyledBackWrapper>
+          </Tooltip>
+          <StyledTitle>{getTitleText()}</StyledTitle>
+          <StyledBoardWrapper>
+            <Board game={game}/>
+            {!game.gameStarted && <SpaceShips game={game} />}
+          </StyledBoardWrapper>
+          <StyledOption disabled={!canClickOnOption} onClick={onOptionClick}>
+            {getOptionText()}
+          </StyledOption>
+        </StyledContainer>
+      </Fade>
+    </>
+  );
 }
 
 export default Game;

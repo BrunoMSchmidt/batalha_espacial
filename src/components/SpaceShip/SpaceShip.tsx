@@ -1,22 +1,34 @@
 import React, { memo, useContext, useEffect, useRef, useState } from 'react';
-import GameContext from '../../contexts/GameContext';
 import { SpaceShip as SpaceShipType } from '../../types/types';
+import {Slide} from "@mui/material";
+import { GameDispatcherContext, GameStateContext } from '../../contexts/GameContext';
 
 type SpaceShipProps = {
   spaceShip: SpaceShipType,
-  index: number
+  index: number,
+  gameStarted: boolean
 }
 
 const SQUARE_SIZE = 50;
 
-const SpaceShip = memo(({ spaceShip, index }: SpaceShipProps) => {
+const SpaceShip = memo(({ spaceShip, index, gameStarted }: SpaceShipProps) => {
   let coords: any = {};
 
   let wait = false;
 
-  const [game, gameDispatcher] = useContext(GameContext);
-  const [coordinates, setCoordinates] = useState(getInitialCoordinates());
+  const gameDispatcher = useContext(GameDispatcherContext);
+  const [coordinates, setCoordinates] = useState(getInicialCoordinates());
   const [isDragging, setIsDragging] = useState(false);
+
+  function getInicialCoordinates() {
+    if(spaceShip.isOnBoard){
+      return { x: (spaceShip.x || 0) * SQUARE_SIZE, y: (spaceShip.y || 0) * SQUARE_SIZE };
+    } else {
+      return { x: 0, y: 0};
+    }
+  }
+
+  console.log("RENDERED SPACESHIP", spaceShip.id);
 
   const imageWrapperStyle: React.CSSProperties = {
     position: spaceShip.isOnBoard ? 'absolute' : 'relative',
@@ -27,6 +39,8 @@ const SpaceShip = memo(({ spaceShip, index }: SpaceShipProps) => {
     zIndex: isDragging ? 20 : 1,
     width: spaceShip.horizontal ? `${SQUARE_SIZE * spaceShip.size}px` : `${SQUARE_SIZE}px`,
     height: spaceShip.horizontal ? `${SQUARE_SIZE}px` : `${SQUARE_SIZE * spaceShip.size}px`,
+    userSelect: 'none',
+    transition: isDragging ? 'none' : '100ms'
   };
 
   const imageStyle: React.CSSProperties = {
@@ -37,22 +51,20 @@ const SpaceShip = memo(({ spaceShip, index }: SpaceShipProps) => {
   };
 
   useEffect(() => {
+    let teste = false;
     if (spaceShip.isOnBoard) {
       setCoordinates({ x: (spaceShip.x || 0) * SQUARE_SIZE, y: (spaceShip.y || 0) * SQUARE_SIZE });
+      teste = true;
     } else {
       setCoordinates({ x: 0, y: 0 });
     }
+    if(!isDragging){
+      console.log("teste");
+    }
   }, [isDragging, spaceShip.isOnBoard, spaceShip.x, spaceShip.y]);
 
-  function getInitialCoordinates() {
-    if (spaceShip.x && spaceShip.y) {
-      return { x: spaceShip.x * SQUARE_SIZE, y: spaceShip.y * SQUARE_SIZE };
-    }
-    return { x: 0, y: 0 };
-  };
-
   function handleMouseDown(e: React.MouseEvent) {
-    if(game.gameStarted) return;
+    if(gameStarted) return;
 
     switch (e.button) {
       case 0: // LEFT CLICK
@@ -86,6 +98,7 @@ const SpaceShip = memo(({ spaceShip, index }: SpaceShipProps) => {
     const position = { x: target.x + SQUARE_SIZE / 2, y: target.y + SQUARE_SIZE / 2 };
 
     gameDispatcher({ type: 'SPACESHIP_DROP', position, spaceShip });
+    console.log("DROPPED RENDERED");
     setIsDragging(false);
   };
 
@@ -112,7 +125,7 @@ const SpaceShip = memo(({ spaceShip, index }: SpaceShipProps) => {
       // after a fraction of a second, allow events again
       setTimeout(() => {
         wait = false;
-      }, 1000 / 25);
+      }, 1000 / 75);
     }
   };
 

@@ -1,8 +1,8 @@
-import React, { createContext, useState, useEffect } from "react";
+import { createContext, useEffect, useRef } from "react";
 import { useImmer } from "use-immer";
 
 // create context
-const ConfigurationContext = createContext({});
+const ConfigurationContext = createContext<any>({});
 
 const ConfigurationContextProvider = ({ children }: any) => {
 
@@ -10,26 +10,36 @@ const ConfigurationContextProvider = ({ children }: any) => {
   const hasBridgeWithElectron = api && api['send'];
 
   const defaultConfiguration = {
-    volumeEffects: true,
-    volumeMusic: true,
+    volumeEffects: 40,
+    volumeMusic: 40,
     showShips: false,
   }
   
-  // the value that will be given to the context
+  // create immer state for statistics
+  const [statistics, setStatistics] = useImmer({});
+
+  const firstRender = useRef(true);
   const [configuration, setConfiguration] = useImmer(defaultConfiguration);
   console.log('provider rendered again', configuration);
   
-  function saveConfig(config: any) {
-    setConfiguration(config);
-    saveConfigOnServer(config);
+  function saveConfig(callback: Function) {
+    setConfiguration(config => {
+      callback(config);
+    });
   }
 
-  function saveConfigOnServer(config: any) {
+  useEffect(() => {
+    if(!firstRender.current){
+      saveConfigOnServer();
+    }
+  }, [configuration])
+
+  function saveConfigOnServer() {
     if(!hasBridgeWithElectron) {
       return ;
     }
 
-    api.send('toMain', { funcao: 'saveConfig', config: config });
+    api.send('toMain', { funcao: 'saveConfig', config: configuration });
   }
 
   async function getConfigFromServer() {
@@ -38,23 +48,25 @@ const ConfigurationContextProvider = ({ children }: any) => {
     }
 
     api.send('toMain', { funcao: 'getConfig' });
-    const configuration = await new Promise<any>((resolve, reject) => {
-      api.receive('fromMain', (resposta: any) => {
-        if(resposta.success){
-          resolve(resposta.result);
-        }
-      })
-    });
-    setConfiguration(configuration);
+    try {
+      const configuration = await new Promise<any>((resolve, reject) => {
+        api.receive('fromMain', (resposta: any) => {
+          if(resposta.success){
+            resolve(resposta.result);
+          } else {
+            reject();
+          }
+        })
+      });
+      setConfiguration(configuration);
+    } catch(e) {
+      setConfiguration(defaultConfiguration);
+    }
   }
 
-  // fetch a user from a fake backend API
   useEffect(() => {
     getConfigFromServer();
-
-    setTimeout(() => {
-      saveConfig({...defaultConfiguration, teste: "Bruno"})
-    }, 8000);
+    firstRender.current = false;
   }, []);
 
   return (

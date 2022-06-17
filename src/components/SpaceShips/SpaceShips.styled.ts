@@ -1,6 +1,6 @@
-import styled from "styled-components";
+import { styled } from "@mui/material/styles";
 
-export const StyledSpaceShips = styled.div`
+export const StyledSpaceShips = styled("div")`
   min-height: 500px;
   background-color: #222;
   display: flex;

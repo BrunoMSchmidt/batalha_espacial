@@ -1,4 +1,5 @@
-import styled, {keyframes} from "styled-components";
+import { styled } from "@mui/material/styles";
+import { keyframes } from "@emotion/react";
 import backgroundImage from "../../assets/images/galaxy.webp";
 
 const animate = keyframes`
@@ -7,7 +8,7 @@ const animate = keyframes`
   }
 `
 
-export const StyledContainer = styled.main`
+export const StyledContainer = styled("main")`
   position: relative;
   min-width: 100vw;
   min-height: 100vh;
@@ -27,5 +28,5 @@ export const StyledContainer = styled.main`
     animation-name: ${animate};
     animation-duration: 90s;
     animation-iteration-count: infinite;
-  }
+  } 
 `

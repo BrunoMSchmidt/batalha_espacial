@@ -1,6 +1,18 @@
-import styled from "styled-components";
+import { styled } from "@mui/material/styles";
+import {css, keyframes} from "@emotion/react";
 
-export const StyledSquare = styled("div")<{ highlight: boolean, occupied: string | null, gameStarted: boolean, clicked: boolean, destroyed: boolean }>(props => `
+const fire = (color: string) => keyframes`
+  100% {
+    transform: scale(1.2);
+    border-radius: 5px;
+    background-color: ${color};
+    box-shadow: 0px 0px 20px 3px red;
+  }
+`
+
+export const StyledSquare = styled("div", { shouldForwardProp(propName) {
+  return propName === "onClick";
+},})<{ highlight: boolean, occupied: string | null, gamestarted: boolean, clicked: boolean, destroyed: boolean, animate: boolean }>(props => css`
     width: 50px;
     height: 50px;
     background-color: ${props.highlight ? props.occupied ? 'red' : 'green' : 'transparent'};
@@ -8,14 +20,18 @@ export const StyledSquare = styled("div")<{ highlight: boolean, occupied: string
     color: #999;
     display: grid;
     place-items: center;
-    overflow: hidden;
-    ${props.gameStarted ? `
-      background-color: ${props.destroyed ? "red" : props.clicked ? props.occupied ? '#fffc93' : '#555' : ''};
+    
+    ${props.gamestarted ? css`
+      background-color: ${props.destroyed ? props.theme.palette.primary.main : props.clicked ? props.occupied ? "lightblue" : '#555' : ''};
       cursor:pointer;
-      ${!props.clicked ? `
+      ${!props.clicked ? css`
           &:hover {
-            background-color: #444};
+            background-color: #444;
           }
         ` : ``}
       ` : ``}
+      ${props.animate ? css`
+      animation: ${fire(props.theme.palette.primary.main)} 200ms ;` : ``
+    }
 `)
+

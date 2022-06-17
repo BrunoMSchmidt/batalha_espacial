@@ -39,7 +39,7 @@ export const getBoardInitialState = () => {
 
 export function getSpaceShipsInitialState(): SpaceShip[] {
   const arr: SpaceShip[] = [];
-  const sizes = [2, 3, 3, 4, 5];
+  const sizes = [2, 3, 3, 4, 5]; // [2, 3, 3, 4, 5]
   sizes.forEach((size) => {
     arr.push(getSpaceShip(size));
   });
@@ -47,7 +47,7 @@ export function getSpaceShipsInitialState(): SpaceShip[] {
   return arr;
 }
 
-export function getGameInitialState(): GameState {
+export function getGameInitialState(opponent: "player" | "computer"): GameState {
   return {
     player1: {
       board: getBoardInitialState(),
@@ -57,9 +57,11 @@ export function getGameInitialState(): GameState {
       board: getBoardInitialState(),
       spaceShips: getSpaceShipsInitialState(),
     },
+    lastClickedSquare: null,
     turn: 'player1',
     gameStarted: false,
-    gameFinished: true,
-    turnFinished: false
+    gameWon: null,
+    turnFinished: false,
+    opponent: opponent
   }
 };

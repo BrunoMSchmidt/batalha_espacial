@@ -1,34 +1,37 @@
-import React, {memo, useContext} from 'react';
+import React, {memo, useContext, useEffect, useState} from 'react';
 import {Square as SquareType} from '../../types/types';
-import { StyledSquare } from "./Square.styled";
-import GameContext from "../../contexts/GameContext";
+import {StyledSquare} from "./Square.styled";
+import { GameDispatcherContext } from "../../contexts/GameContext";
 
 type SquareProps = SquareType & {
     x: number,
     y: number,
-    gameStarted: boolean
+    gameStarted: boolean,
+    turnFinished: boolean,
+    animate: boolean
 };
 
 const Square = memo(({
-                         x, y, highlight, occupied, gameStarted, clicked, destroyed
+                         x, y, highlight, occupied, gameStarted, clicked, destroyed, turnFinished, animate
                      }: SquareProps) => {
 
-    const [game, gameDispatcher] = useContext(GameContext);
+    const gameDispatcher = useContext(GameDispatcherContext);
 
     const onSquareClick = () => {
-        gameDispatcher({type: 'SQUARE_CLICK', position: { x, y }})
+        gameDispatcher({type: 'SQUARE_CLICK', position: {x, y}})
     }
 
     return (
         <StyledSquare
             highlight={highlight}
             occupied={occupied}
-            gameStarted={gameStarted}
+            gamestarted={gameStarted}
             clicked={clicked}
             destroyed={destroyed}
             className={`droppable`}
             onClick={onSquareClick}
-        > </StyledSquare>
+            animate={animate}
+        ></StyledSquare>
     );
 });
 

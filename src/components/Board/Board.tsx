@@ -1,11 +1,11 @@
 import {useContext} from 'react';
-import GameContext from '../../contexts/GameContext';
+import { GameState } from '../../types/types';
 import SpaceShip from '../SpaceShip/SpaceShip';
 import Square from '../Square/Square';
 import {StyledBoard, StyledRow} from "./Board.styled";
 
-function Board() {
-    const [game,] = useContext(GameContext);
+function Board(props: {game: GameState}) {
+    const {game} = props;
 
     let turn = game.turn;
     if (game.gameStarted) {
@@ -23,6 +23,7 @@ function Board() {
                     <SpaceShip
                         key={spaceShip.id}
                         spaceShip={spaceShip}
+                        gameStarted={game.gameStarted}
                         index={index}
                     />
                 ))
@@ -30,8 +31,10 @@ function Board() {
         </div>
     )
 
+    const boardId = game.gameStarted ? `board-${turn}` : `board`;
+    
     return (
-        <StyledBoard>
+        <StyledBoard id={boardId}>
             {board.map((row, i) => (
                 <StyledRow key={i}>
                     {row.map((square, j) => (
@@ -44,6 +47,8 @@ function Board() {
                             gameStarted={game.gameStarted}
                             clicked={square.clicked}
                             destroyed={square.destroyed}
+                            turnFinished={game.turnFinished}
+                            animate={game.lastClickedSquare == `${i}-${j}`}
                         />))}
                 </StyledRow>
             ))}

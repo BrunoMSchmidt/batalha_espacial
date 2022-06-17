@@ -24,8 +24,52 @@ export type GameState = {
     board: Square[][],
     spaceShips: SpaceShip[]
   },
+  lastClickedSquare: string | null,
   turn: 'player1' | 'player2',
   gameStarted: boolean,
-  gameFinished: boolean,
-  turnFinished: boolean
+  gameWon: 'player1' | 'player2' | null,
+  turnFinished: boolean,
+  opponent: "player" | "computer"
+}
+
+export type Sound = {
+  name: "preGameSoundtrack" | "hover" | "select",
+  type: "music" | "effect",
+  autoplay?: boolean,
+  loop?: boolean
+  sound: any
+}
+
+export type Configuration = {
+  volumeEffects: number,
+  volumeMusic: number
+}
+
+export type Statistics = {
+  gamesPlayed: number,
+  wins: {
+    player1: number,
+    player2: number,
+    computer: number
+  },
+  losses: {
+    player1: number,
+    player2: number,
+    computer: number
+  },
+  spaceshipsDestroyed: {
+    player1: number,
+    player2: number,
+    computer: number
+  },
+  shotsMissed: {
+    player1: number,
+    player2: number,
+    computer: number
+  },
+  shotsHit: {
+    player1: number,
+    player2: number,
+    computer: number
+  }
 }

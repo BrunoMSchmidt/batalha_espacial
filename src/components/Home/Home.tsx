@@ -1,35 +1,89 @@
-import {useContext, useEffect} from 'react';
-import { Link } from 'react-router-dom';
-import styles from './Home.module.scss';
-import {SoundContext} from "../../contexts/SoundContext";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { SoundContext } from "../../contexts/SoundContext";
+import {
+  StyledContainer,
+  StyledOption,
+  StyledOptions,
+  StyledTitle,
+} from "./Home.styled";
+import { Zoom } from "@mui/material";
 
 function Home() {
-  console.log('RENDER - Home.');
+  console.log("RENDER - Home.");
 
-  const { playAudio, stopAudio } = useContext(SoundContext);
+  const { playAudio } = useContext(SoundContext);
+  const navigate = useNavigate();
+  const [showPlayOptions, setShowPlayOptions] = useState(false);
 
   function quitApp() {
     const win = window as any;
     const { api } = win;
 
-    api.send('toMain', { funcao: 'sair' });
+    api.send("toMain", { funcao: "sair" });
+  }
+
+  function onOptionClick(path: string = ".") {
+    playAudio("select");
+    navigateTo(path);
+  }
+
+  function navigateTo(path: string, options = {}) {
+    navigate(path, options);
   }
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>BATALHA ESPACIAL</h1>
-      <div className={styles.options}>
-        <Link to="/game" className={styles.option} onMouseEnter={() => playAudio('hover')} onClick={() => playAudio('select')}>
-          Jogar
-        </Link>
-        <Link to="/config" className={styles.option} onMouseEnter={() => playAudio('hover')} onClick={() => playAudio('select')}>
-          Configurações
-        </Link>
-        <Link to="." className={styles.option} onMouseEnter={() => playAudio('hover')} onClick={() => {quitApp(); playAudio('select')}}>
-          Sair
-        </Link>
-      </div>
-    </div>
+    <Zoom in={true}>
+      <StyledContainer>
+        <StyledTitle>BATALHA ESPACIAL</StyledTitle>
+
+        <StyledOptions>
+          {showPlayOptions ? (
+            <>
+              <StyledOption
+                onMouseEnter={() => playAudio("hover")}
+                onClick={() => onOptionClick("/game/computer")}
+              >
+                Computador
+              </StyledOption>
+              <StyledOption
+                onMouseEnter={() => playAudio("hover")}
+                onClick={() => onOptionClick("/game/player")}
+              >
+                2 Jogadores
+              </StyledOption>
+              <StyledOption
+                onMouseEnter={() => playAudio("hover")}
+                onClick={() => setShowPlayOptions(false)}
+              >
+                Voltar
+              </StyledOption>
+            </>
+          ) : (
+            <>
+              <StyledOption
+                onMouseEnter={() => playAudio("hover")}
+                onClick={() => setShowPlayOptions(true)}
+              >
+                Jogar
+              </StyledOption>
+              <StyledOption
+                onMouseEnter={() => playAudio("hover")}
+                onClick={() => onOptionClick("/config")}
+              >
+                Configurações
+              </StyledOption>
+              <StyledOption
+                onMouseEnter={() => playAudio("hover")}
+                onClick={quitApp}
+              >
+                Sair
+              </StyledOption>
+            </>
+          )}
+        </StyledOptions>
+      </StyledContainer>
+    </Zoom>
   );
 }
 
