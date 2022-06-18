@@ -29,14 +29,14 @@ export const StyledBackIcon = styled(ArrowBackIos)(({ theme }) => `
   transition: 100ms;
 `)
 
-export const StyledBoardWrapper = styled("div")`
+export const StyledBoardWrapper = styled("div")<{squareSize: number}>(props => `
   display: flex;
   justify-content: center;
   width: 100%;
   align-items: flex-start;
-  max-height: 500px;
+  max-height: ${props.squareSize * 10}px;
   overflow: hidden;
-`
+`);
 
 export const StyledContainer = styled("div")`
   display: flex;

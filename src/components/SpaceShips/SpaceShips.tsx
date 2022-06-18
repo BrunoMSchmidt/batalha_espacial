@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import { GameState, SpaceShip as SpaceShipType } from '../../types/types';
 import SpaceShip from '../SpaceShip/SpaceShip';
 import { StyledSpaceShips } from "./SpaceShips.styled";
@@ -13,7 +12,7 @@ function SpaceShips(props: {game: GameState}) {
   return (
     <StyledSpaceShips>
       {spaceShips.filter((spaceShip: any) => !spaceShip.isOnBoard).map((spaceShip: any, index: number) => (
-        <SpaceShip key={spaceShip.id} spaceShip={spaceShip} index={index} gameStarted={game.gameStarted} />
+        <SpaceShip key={spaceShip.id} spaceShip={spaceShip} index={index} gameStarted={game.gameStarted} squareSize={game.squareSize}/>
       ))}
     </StyledSpaceShips>
   );

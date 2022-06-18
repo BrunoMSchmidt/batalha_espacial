@@ -5,7 +5,8 @@ export type SpaceShip = {
   x: number | null,
   y: number | null,
   horizontal: boolean,
-  isOnBoard: boolean
+  isOnBoard: boolean,
+  destroyed: boolean
 }
 
 export type Square = {
@@ -29,11 +30,14 @@ export type GameState = {
   gameStarted: boolean,
   gameWon: 'player1' | 'player2' | null,
   turnFinished: boolean,
-  opponent: "player" | "computer"
+  opponent: "player" | "computer",
+  squareSize: number
 }
 
+export type SoundNames = "preGameSoundtrack" | "hover" | "select" | 'hit' | 'miss' | 'startGame' | 'hoverSquare' | 'pickSpaceship';
+
 export type Sound = {
-  name: "preGameSoundtrack" | "hover" | "select",
+  name: SoundNames,
   type: "music" | "effect",
   autoplay?: boolean,
   loop?: boolean
@@ -46,7 +50,11 @@ export type Configuration = {
 }
 
 export type Statistics = {
-  gamesPlayed: number,
+  gamesPlayed: {
+    player1: number,
+    player2: number,
+    computer: number
+  },
   wins: {
     player1: number,
     player2: number,

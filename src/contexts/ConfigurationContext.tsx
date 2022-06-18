@@ -14,9 +14,6 @@ const ConfigurationContextProvider = ({ children }: any) => {
     volumeMusic: 40,
     showShips: false,
   }
-  
-  // create immer state for statistics
-  const [statistics, setStatistics] = useImmer({});
 
   const firstRender = useRef(true);
   const [configuration, setConfiguration] = useImmer(defaultConfiguration);
@@ -39,7 +36,9 @@ const ConfigurationContextProvider = ({ children }: any) => {
       return ;
     }
 
-    api.send('toMain', { funcao: 'saveConfig', config: configuration });
+    console.log("SAVING CONFIG ON SERVER", configuration)
+
+    api.send('toMain', { function: 'saveConfig', config: configuration });
   }
 
   async function getConfigFromServer() {
@@ -47,19 +46,24 @@ const ConfigurationContextProvider = ({ children }: any) => {
       return ;
     }
 
-    api.send('toMain', { funcao: 'getConfig' });
+    api.send('toMain', { function: 'getConfig' });
     try {
       const configuration = await new Promise<any>((resolve, reject) => {
         api.receive('fromMain', (resposta: any) => {
+          console.log("config resposta", resposta);
           if(resposta.success){
             resolve(resposta.result);
           } else {
+            console.log("ERRO AQUI");
             reject();
           }
         })
       });
+      console.log("pEGOU CONFIG", configuration);
       setConfiguration(configuration);
     } catch(e) {
+      console.log("pEGOU CONFIG DEU ERRO", configuration);
+
       setConfiguration(defaultConfiguration);
     }
   }

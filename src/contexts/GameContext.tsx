@@ -1,8 +1,10 @@
-import { createContext, Dispatch } from "react";
+import { createContext, Dispatch, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { useImmerReducer } from "use-immer";
 import { GameState, SpaceShip, Square } from "../types/types";
 import * as gameHelper from "../utils/gameHelper";
+import { SoundContext } from "./SoundContext";
+import { StatisticsContext } from "./StatisticsContext";
 
 // @ts-ignore
 export const GameStateContext = createContext<GameState>(null);
@@ -11,6 +13,9 @@ export const GameDispatcherContext = createContext<Dispatch<any>>(null);
 
 export const GameContextProvider = ({ children }: any) => {
   let { opponent } = useParams();
+  const { playAudio } = useContext(SoundContext);
+  const { increment } = useContext(StatisticsContext)
+
   if (opponent !== "player" && opponent !== "computer") {
     return <></>;
   }
@@ -44,6 +49,13 @@ export const GameContextProvider = ({ children }: any) => {
       case "AI_PLAY":
         onAIPlay(state);
         break;
+      case "POSITION_SPACE_SHIPS_AI":
+        onPositionSpaceShipsAI(state);
+        break;
+      case "WINDOW_RESIZE":
+        console.log(action);
+        onWindowResize(state, action.width, action.height);
+        break;
       default:
         throw new Error();
     }
@@ -71,7 +83,7 @@ export const GameContextProvider = ({ children }: any) => {
   };
 
   const updateDestroyedShips = (state: GameState, spaceShipId: string) => {
-    const { board } = state[state.turn == "player1" ? "player2" : "player1"];
+    const { board, spaceShips } = state[state.turn == "player1" ? "player2" : "player1"];
 
     const squares: Square[] = [];
     board.forEach((row) =>
@@ -84,6 +96,10 @@ export const GameContextProvider = ({ children }: any) => {
 
     if (squares.every((square) => square.clicked)) {
       squares.forEach((square) => (square.destroyed = true));
+      const spaceShip = spaceShips.find((spaceShip) => spaceShip.id == spaceShipId);
+      if(!spaceShip) return ;
+      spaceShip.destroyed = true;
+      increment('spaceshipsDestroyed', state.turn == "player1" ? "player1" : state.opponent == "computer" ? "computer" : "player2");
     }
   };
 
@@ -130,15 +146,21 @@ export const GameContextProvider = ({ children }: any) => {
       if (square.occupied) {
         updateDestroyedShips(state, square.occupied);
         checkWin(state);
-      } 
-    }
 
-    state.turnFinished = true;
+        playAudio('hit');
+        increment('shotsHit', state.turn == "player1" ? "player1" : state.opponent == "computer" ? "computer" : "player2");
+      } else {
+        playAudio('miss');
+        increment('shotsMissed', state.turn == "player1" ? "player1" : state.opponent == "computer" ? "computer" : "player2");
+      }
+      state.turnFinished = true;
+    }
   }
 
   const getSquareByCoordinates = (
     x: number,
-    y: number
+    y: number,
+    squareSize: number
   ): { x: number; y: number } | null => {
     if (!x || !y) {
       return null;
@@ -154,16 +176,16 @@ export const GameContextProvider = ({ children }: any) => {
 
     if (
       coordinates.x < 0 ||
-      coordinates.x >= 500 ||
+      coordinates.x >= squareSize * 10 ||
       coordinates.y < 0 ||
-      coordinates.y >= 500
+      coordinates.y >= squareSize * 10
     ) {
       return null;
     }
 
     return {
-      x: Math.floor(coordinates.x / 50),
-      y: Math.floor(coordinates.y / 50),
+      x: Math.floor(coordinates.x / squareSize),
+      y: Math.floor(coordinates.y / squareSize),
     };
   };
 
@@ -199,7 +221,7 @@ export const GameContextProvider = ({ children }: any) => {
   ): any => {
     const { board, spaceShips } = state[state.turn];
 
-    const squareCoordinates = getSquareByCoordinates(position.x, position.y);
+    const squareCoordinates = getSquareByCoordinates(position.x, position.y, state.squareSize);
     if (squareCoordinates) {
       const { x, y } = squareCoordinates;
 
@@ -346,7 +368,7 @@ export const GameContextProvider = ({ children }: any) => {
       return;
     }
 
-    const squareCoordinate = getSquareByCoordinates(position.x, position.y);
+    const squareCoordinate = getSquareByCoordinates(position.x, position.y, state.squareSize);
 
     const { board } = state[state.turn];
     resetHighlight(board);
@@ -405,6 +427,33 @@ export const GameContextProvider = ({ children }: any) => {
     }
   };
 
+  const onPositionSpaceShipsAI = (state: GameState) => {
+    if(state.gameStarted || (state.opponent == "computer" && state.player2.spaceShips.every(({ isOnBoard }) => isOnBoard))) {
+      return ;
+    }
+
+    const { board, spaceShips } = state.player2;
+
+    const setRandomCoordinates = (spaceShip: SpaceShip): { start: { x: number; y: number }; end: { x: number; y: number } } => {
+      spaceShip.horizontal = Math.random() > 0.5;
+      spaceShip.x = Math.floor(Math.random() * (spaceShip.horizontal ? 11 - spaceShip.size : 10));
+      spaceShip.y = Math.floor(Math.random() * (spaceShip.horizontal ? 10 : 11 - spaceShip.size));
+      spaceShip.isOnBoard = true;
+      return getStartAndEndCoordinates(spaceShip.x, spaceShip.y, spaceShip.size, spaceShip.horizontal);
+    }
+
+    for(let i = 0; i < spaceShips.length; i++) {
+      const spaceShip = spaceShips[i];
+      if(!spaceShip.isOnBoard || !spaceShip.x || !spaceShip.y || true) {
+        let coordinates = setRandomCoordinates(spaceShip);
+        while(detectColision(board, coordinates.start, coordinates.end, spaceShip)) {
+          coordinates = setRandomCoordinates(spaceShip);
+        }
+      }
+      updateOccupiedSquares(board, spaceShips);
+    }
+  }
+
   const onAIPlay = (state: GameState) => {
     let position = {
       x: Math.floor(Math.random() * 10),
@@ -422,6 +471,11 @@ export const GameContextProvider = ({ children }: any) => {
     }
     squareClick(state, position);
   };
+  
+  const onWindowResize = (state: GameState, width: number, height: number) => {
+    console.log("teste", width, height);
+    state.squareSize = Math.min(width / 12, (height - 88) / 12);
+  }
 
   const [game, gameStateDispatcher] = useImmerReducer(
     gameStateReducer,

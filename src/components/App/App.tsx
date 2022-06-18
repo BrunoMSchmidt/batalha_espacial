@@ -7,6 +7,8 @@ import { SoundContextProvider } from "../../contexts/SoundContext";
 import { Configuration } from "../Configuration/Configuration";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { GameContextProvider } from "../../contexts/GameContext";
+import { Statistics } from "../Statistics/Statistics";
+import { StatisticsContextProvider } from "../../contexts/StatisticsContext";
 
 const theme = createTheme({
   palette: {
@@ -31,18 +33,21 @@ function App() {
         <StyledContainer>
           <ConfigurationContextProvider>
             <SoundContextProvider>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route
-                  path="/game/:opponent"
-                  element={
-                    <GameContextProvider>
-                      <Game />
-                    </GameContextProvider>
-                  }
-                />
-                <Route path="/config" element={<Configuration />} />
-              </Routes>
+              <StatisticsContextProvider>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route
+                    path="/game/:opponent"
+                    element={
+                      <GameContextProvider>
+                        <Game />
+                      </GameContextProvider>
+                    }
+                  />
+                  <Route path="/config" element={<Configuration />} />
+                  <Route path="/statistics" element={<Statistics />} />
+                </Routes>
+              </StatisticsContextProvider>
             </SoundContextProvider>
           </ConfigurationContextProvider>
         </StyledContainer>

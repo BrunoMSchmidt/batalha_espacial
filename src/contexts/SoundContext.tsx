@@ -3,8 +3,13 @@ import React, {createContext, useContext, useEffect, useRef} from "react";
 import Hover from '../assets/sounds/Hover.mp3';
 import PreGameSoundtrack from '../assets/sounds/Pre-Game Soundtrack.mp3';
 import Select from '../assets/sounds/Select.mp3';
+import Hit from "../assets/sounds/hit_shot.mp3";
+import Miss from "../assets/sounds/miss_shot.mp3";
+import PickSpaceship from "../assets/sounds/pick_spaceship1.mp3";
+import StartGame from "../assets/sounds/start_game.mp3";
+import HoverSquares from "../assets/sounds/hover_squares.mp3";
 import {ConfigurationContext} from "./ConfigurationContext";
-import { Sound } from "../types/types";
+import { Sound, SoundNames } from "../types/types";
 import { matchPath, matchRoutes, useLocation } from "react-router-dom";
 
 const SoundContext = createContext<any>(null);
@@ -26,16 +31,37 @@ const sounds: Sound[] = [
         name: 'select',
         sound: Select,
         type: 'effect'
+    },
+    {
+        name: 'hit',
+        sound: Hit,
+        type: 'effect'
+    },
+    {
+        name: 'miss',
+        sound: Miss,
+        type: 'effect'
+    },
+    {
+        name: 'pickSpaceship',
+        sound: PickSpaceship,
+        type: 'effect'
+    },
+    {
+        name: 'startGame',
+        sound: StartGame,
+        type: 'effect'
+    },
+    {
+        name: 'hoverSquare',
+        sound: HoverSquares,
+        type: 'effect'
     }
 ]
 
 type soundElementType = {
-    hover: HTMLAudioElement,
-    preGameSoundtrack: HTMLAudioElement,
-    select: HTMLAudioElement,
-}
-
-type soundType = 'hover' | 'preGameSoundtrack' | 'select';
+    [key in SoundNames]: HTMLAudioElement;
+};
 
 const SoundContextProvider = ({children}: any) => {
     const { configuration } = useContext(ConfigurationContext);
@@ -88,7 +114,7 @@ const SoundContextProvider = ({children}: any) => {
         soundElements.current = auxSoundElements;
     }
 
-    const playAudio = (name: soundType) => {
+    const playAudio = (name: SoundNames) => {
         if(!soundElements.current){
             setTimeout(() => {
                 stopAudio(name);
@@ -100,7 +126,7 @@ const SoundContextProvider = ({children}: any) => {
         el.play();
     }
 
-    const stopAudio = (name: soundType) => {
+    const stopAudio = (name: SoundNames) => {
         if(!soundElements.current){
             setTimeout(() => {
                 stopAudio(name);

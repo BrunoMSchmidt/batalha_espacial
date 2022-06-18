@@ -26,6 +26,8 @@ function createWindow() {
       : `file://${path.join(__dirname, '../build/index.html')}`,
   );
 
+  mainWindow.webContents.openDevTools()
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -46,7 +48,7 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-function sair() {
+function quit() {
   app.quit();
 }
 
@@ -75,6 +77,40 @@ function getConfig() {
   fs.readFile(configPath, (err, data) => {
     if(err){
       mainWindow.webContents.send("fromMain", { success: false, message: err });
+
+    } else {
+      const jsonString = Buffer.from(data).toString('utf8')
+      const parsedData = JSON.parse(jsonString)
+
+      mainWindow.webContents.send("fromMain", { success: true, result: parsedData });
+    }
+  })
+}
+
+function saveStatistics(statistics) {
+  const folderPath = path.join(os.tmpdir(), 'batalha_espacial');
+  const filePath = path.join(folderPath, 'statistics.json');
+  if(!fs.existsSync(folderPath)){
+    fs.mkdirSync(folderPath, { recursive: true });
+  }
+
+  const dataToSave = JSON.stringify(statistics);
+
+  fs.writeFile(filePath, dataToSave, (err) => {
+    if(err) {
+      mainWindow.webContents.send("fromMain", { success: false, message: err });
+    } else {
+      mainWindow.webContents.send("fromMain", { success: true });
+    }
+  });
+
+}
+
+function getStatistics() {
+  const configPath = path.join(os.tmpdir(), 'batalha_espacial', 'statistics.json');
+  fs.readFile(configPath, (err, data) => {
+    if(err){
+      mainWindow.webContents.send("fromMain", { success: false, message: err });
     } else {
       const jsonString = Buffer.from(data).toString('utf8')
       const parsedData = JSON.parse(jsonString)
@@ -85,7 +121,13 @@ function getConfig() {
 }
 
 ipcMain.on('toMain', (event, args) => {
-  if (args.funcao === 'sair') sair();
-  if (args.funcao === 'getConfig') getConfig();
-  if (args.funcao === 'saveConfig') saveConfig(args.config);
+  const functions = {
+    quit: quit,
+    getConfig: getConfig,
+    saveConfig: saveConfig.bind(null, args.config),
+    getStatistics: getStatistics,
+    saveStatistics: saveStatistics.bind(null, args.statistics),
+  }
+
+  functions[args.function] && functions[args.function]();
 });

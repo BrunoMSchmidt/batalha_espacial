@@ -1,20 +1,21 @@
-import React, { memo, useContext, useEffect, useRef, useState } from 'react';
+import React, { memo, useContext, useEffect, useState } from 'react';
 import { SpaceShip as SpaceShipType } from '../../types/types';
-import {Slide} from "@mui/material";
-import { GameDispatcherContext, GameStateContext } from '../../contexts/GameContext';
+import { GameDispatcherContext } from '../../contexts/GameContext';
+import { SoundContext } from '../../contexts/SoundContext';
 
 type SpaceShipProps = {
   spaceShip: SpaceShipType,
   index: number,
-  gameStarted: boolean
+  gameStarted: boolean,
+  squareSize: number,
 }
 
-const SQUARE_SIZE = 50;
-
-const SpaceShip = memo(({ spaceShip, index, gameStarted }: SpaceShipProps) => {
+const SpaceShip = memo(({ spaceShip, index, gameStarted, squareSize }: SpaceShipProps) => {
   let coords: any = {};
 
   let wait = false;
+
+  const { playAudio } = useContext(SoundContext);
 
   const gameDispatcher = useContext(GameDispatcherContext);
   const [coordinates, setCoordinates] = useState(getInicialCoordinates());
@@ -22,7 +23,7 @@ const SpaceShip = memo(({ spaceShip, index, gameStarted }: SpaceShipProps) => {
 
   function getInicialCoordinates() {
     if(spaceShip.isOnBoard){
-      return { x: (spaceShip.x || 0) * SQUARE_SIZE, y: (spaceShip.y || 0) * SQUARE_SIZE };
+      return { x: (spaceShip.x || 0) * squareSize, y: (spaceShip.y || 0) * squareSize };
     } else {
       return { x: 0, y: 0};
     }
@@ -37,23 +38,23 @@ const SpaceShip = memo(({ spaceShip, index, gameStarted }: SpaceShipProps) => {
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     zIndex: isDragging ? 20 : 1,
-    width: spaceShip.horizontal ? `${SQUARE_SIZE * spaceShip.size}px` : `${SQUARE_SIZE}px`,
-    height: spaceShip.horizontal ? `${SQUARE_SIZE}px` : `${SQUARE_SIZE * spaceShip.size}px`,
+    width: spaceShip.horizontal ? `${squareSize * spaceShip.size}px` : `${squareSize}px`,
+    height: spaceShip.horizontal ? `${squareSize}px` : `${squareSize * spaceShip.size}px`,
     userSelect: 'none',
     transition: isDragging ? 'none' : '100ms'
   };
 
   const imageStyle: React.CSSProperties = {
     objectFit: 'cover',
-    width: `${SQUARE_SIZE}px`,
-    height: `${SQUARE_SIZE * spaceShip.size}px`,
-    transform: spaceShip.horizontal ? `rotate(90deg) translate(-${(spaceShip.size - 1) * SQUARE_SIZE / 2}px,${-(spaceShip.size - 1) * SQUARE_SIZE / 2}px)` : 'none',
+    width: `${squareSize}px`,
+    height: `${squareSize * spaceShip.size}px`,
+    transform: spaceShip.horizontal ? `rotate(90deg) translate(-${(spaceShip.size - 1) * squareSize / 2}px,${-(spaceShip.size - 1) * squareSize / 2}px)` : 'none',
   };
 
   useEffect(() => {
     let teste = false;
     if (spaceShip.isOnBoard) {
-      setCoordinates({ x: (spaceShip.x || 0) * SQUARE_SIZE, y: (spaceShip.y || 0) * SQUARE_SIZE });
+      setCoordinates({ x: (spaceShip.x || 0) * squareSize, y: (spaceShip.y || 0) * squareSize });
       teste = true;
     } else {
       setCoordinates({ x: 0, y: 0 });
@@ -61,10 +62,12 @@ const SpaceShip = memo(({ spaceShip, index, gameStarted }: SpaceShipProps) => {
     if(!isDragging){
       console.log("teste");
     }
-  }, [isDragging, spaceShip.isOnBoard, spaceShip.x, spaceShip.y]);
+  }, [isDragging, spaceShip.isOnBoard, spaceShip.x, spaceShip.y, squareSize]);
 
   function handleMouseDown(e: React.MouseEvent) {
     if(gameStarted) return;
+
+    playAudio('pickSpaceship');
 
     switch (e.button) {
       case 0: // LEFT CLICK
@@ -95,7 +98,7 @@ const SpaceShip = memo(({ spaceShip, index, gameStarted }: SpaceShipProps) => {
     coords = {};
 
     const target = e.target as HTMLImageElement;
-    const position = { x: target.x + SQUARE_SIZE / 2, y: target.y + SQUARE_SIZE / 2 };
+    const position = { x: target.x + squareSize / 2, y: target.y + squareSize / 2 };
 
     gameDispatcher({ type: 'SPACESHIP_DROP', position, spaceShip });
     console.log("DROPPED RENDERED");
@@ -118,7 +121,7 @@ const SpaceShip = memo(({ spaceShip, index, gameStarted }: SpaceShipProps) => {
 
     if (!wait && target && target.x && target.y) {
       // fire the event
-      const position = { x: target.x + SQUARE_SIZE / 2, y: target.y + SQUARE_SIZE / 2 };
+      const position = { x: target.x + squareSize / 2, y: target.y + squareSize / 2 };
       gameDispatcher({ type: 'SPACESHIP_MOVE', position, spaceShip });
       // stop any further events
       wait = true;

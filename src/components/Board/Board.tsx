@@ -18,12 +18,13 @@ function Board(props: {game: GameState}) {
     const spaceShipsElement = (
         <div className="spaceships">
             {spaceShips
-                .filter(spaceShip => spaceShip.isOnBoard)
+                .filter(spaceShip => game.gameStarted ? spaceShip.destroyed : spaceShip.isOnBoard)
                 .map((spaceShip: any, index: number) => (
                     <SpaceShip
                         key={spaceShip.id}
                         spaceShip={spaceShip}
                         gameStarted={game.gameStarted}
+                        squareSize={game.squareSize}
                         index={index}
                     />
                 ))
@@ -48,11 +49,12 @@ function Board(props: {game: GameState}) {
                             clicked={square.clicked}
                             destroyed={square.destroyed}
                             turnFinished={game.turnFinished}
+                            squareSize={game.squareSize}
                             animate={game.lastClickedSquare == `${i}-${j}`}
                         />))}
                 </StyledRow>
             ))}
-            {!game.gameStarted && spaceShipsElement}
+            {spaceShipsElement}
         </StyledBoard>
     );
 }

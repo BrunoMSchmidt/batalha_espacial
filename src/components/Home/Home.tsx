@@ -8,6 +8,7 @@ import {
   StyledTitle,
 } from "./Home.styled";
 import { Zoom } from "@mui/material";
+import { StatisticsContext } from "../../contexts/StatisticsContext";
 
 function Home() {
   console.log("RENDER - Home.");
@@ -15,16 +16,21 @@ function Home() {
   const { playAudio } = useContext(SoundContext);
   const navigate = useNavigate();
   const [showPlayOptions, setShowPlayOptions] = useState(false);
+  const { increment } = useContext(StatisticsContext);
 
   function quitApp() {
     const win = window as any;
     const { api } = win;
 
-    api.send("toMain", { funcao: "sair" });
+    api.send("toMain", { function: "quit" });
   }
 
   function onOptionClick(path: string = ".") {
-    playAudio("select");
+    if(path == "/game/player" || path == "/game/computer") {
+      playAudio('startGame');
+    } else {
+      playAudio("select");
+    }
     navigateTo(path);
   }
 
@@ -66,6 +72,12 @@ function Home() {
                 onClick={() => setShowPlayOptions(true)}
               >
                 Jogar
+              </StyledOption>
+              <StyledOption
+                onMouseEnter={() => playAudio("hover")}
+                onClick={() => onOptionClick("/statistics")}
+              >
+                Estatísticas
               </StyledOption>
               <StyledOption
                 onMouseEnter={() => playAudio("hover")}

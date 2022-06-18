@@ -21,7 +21,8 @@ export function getSpaceShip(size: number): SpaceShip {
     x: null,
     y: null,
     horizontal: false,
-    isOnBoard: false
+    isOnBoard: false,
+    destroyed: false
   };
 }
 
@@ -62,6 +63,7 @@ export function getGameInitialState(opponent: "player" | "computer"): GameState 
     gameStarted: false,
     gameWon: null,
     turnFinished: false,
-    opponent: opponent
+    opponent: opponent,
+    squareSize: Math.min(window.innerWidth / 12, (window.innerHeight - 88) / 12)
   }
 };

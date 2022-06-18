@@ -19,6 +19,7 @@ import Modal from "@mui/material/Modal";
 import GameResult from "../GameResult/GameResult";
 import { Fade, Tooltip } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
+import { SpaceShip } from "../../types/types";
 
 function Game() {
   const navigate = useNavigate();
@@ -32,11 +33,22 @@ function Game() {
 
   const { playAudio, stopAudio } = useContext(SoundContext);
 
+  const onResize = () => {
+    console.log(window.innerWidth, window.innerHeight);
+    gameStateDispatcher({ type: "WINDOW_RESIZE", width: window.innerWidth, height: window.innerHeight });
+  }
+
   useEffect(() => {
     stopAudio("preGameSoundtrack");
+    if(!game.gameStarted && game.opponent == "computer" && game.player2.spaceShips.some((spaceShip: SpaceShip) => !spaceShip.isOnBoard)) {
+      gameStateDispatcher({ type: "POSITION_SPACE_SHIPS_AI"});
+    }
+
+    window.addEventListener('resize', onResize);
 
     return () => {
       playAudio("preGameSoundtrack");
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
@@ -53,15 +65,18 @@ function Game() {
   }
 
   const onOptionClick = () => {
-    gameStateDispatcher({ type: "CHANGE_TURN" });
-    if (game.turn == "player2" && !game.gameStarted) {
+    if ((game.turn == "player2" || game.opponent == "computer") && !game.gameStarted ) {
       gameStateDispatcher({ type: "START_GAME" });
+      if(game.opponent == "computer") {
+        return ;
+      }
     }
+    gameStateDispatcher({ type: "CHANGE_TURN" });
   };
 
   const getOptionText = () => {
     return !game.gameStarted
-      ? game.turn == "player2"
+      ? game.turn == "player2" || game.opponent == "computer"
         ? "Start"
         : "READY"
       : "NEXT";
@@ -97,7 +112,7 @@ function Game() {
             </StyledBackWrapper>
           </Tooltip>
           <StyledTitle>{getTitleText()}</StyledTitle>
-          <StyledBoardWrapper>
+          <StyledBoardWrapper squareSize={game.squareSize}>
             <Board game={game}/>
             {!game.gameStarted && <SpaceShips game={game} />}
           </StyledBoardWrapper>
