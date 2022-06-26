@@ -1,5 +1,5 @@
 {
-  "name": "batalha_astral",
+  "name": "batalha_espacial",
   "description": "Um jogo no clássico \"batalha naval\"",
   "version": "0.1.3",
   "private": true,
@@ -78,6 +78,9 @@
       "node_modules/**/*",
       "package.json"
     ],
+    "win": {
+      "icon": "public/icon.png"
+    },
     "directories": {
       "buildResources": "assets"
     },

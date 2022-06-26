@@ -10,6 +10,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 720,
+    icon: __dirname + '/icon.png',
     webPreferences: {
       nodeIntegration: false,
       enableRemoteModule: true,
