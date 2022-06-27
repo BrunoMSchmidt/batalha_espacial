@@ -116,6 +116,10 @@ export const GameContextProvider = ({ children }: any) => {
     );
 
     if (squares.every((square) => square.destroyed)) {
+      increment('wins', state.turn == "player1" ? "player1" : state.opponent == "computer" ? "computer" : "player2");
+      increment('losses', state.turn == "player2" ? "player1" : state.opponent == "computer" ? "computer" : "player2");
+      increment('gamesPlayed', state.turn);
+      increment('gamesPlayed', state.opponent);
       state.gameWon = state.turn;
     }
   };

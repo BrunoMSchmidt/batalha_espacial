@@ -77,9 +77,9 @@ function Game() {
   const getOptionText = () => {
     return !game.gameStarted
       ? game.turn == "player2" || game.opponent == "computer"
-        ? "Start"
-        : "READY"
-      : "NEXT";
+        ? "Começar"
+        : "Pronto"
+      : "Prosseguir";
   };
 
   const getTitleText = () => {
@@ -99,7 +99,7 @@ function Game() {
         closeAfterTransition                
       >
         <>
-          <GameResult player={game.turn}></GameResult>
+          <GameResult player={game.turn} opponent={game.opponent}></GameResult>
         </>
       </Modal>
       <Fade in={true}>

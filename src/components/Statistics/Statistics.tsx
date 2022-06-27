@@ -41,10 +41,12 @@ const Statistics = () => {
           <StyledTitle>Estatísticas</StyledTitle>
             <StyledTable>
               <thead>
-                <th> </th>
-                <th>Jogador 1</th>
-                <th>Jogador 2</th>
-                <th>Computador</th>
+                <tr>
+                  <th> </th>
+                  <th>Jogador 1</th>
+                  <th>Jogador 2</th>
+                  <th>Computador</th>
+                </tr>
               </thead>
               <tbody>
               <tr>

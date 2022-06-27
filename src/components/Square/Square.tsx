@@ -24,6 +24,12 @@ const Square = memo(({
         gameDispatcher({type: 'SQUARE_CLICK', position: {x, y}})
     }
 
+    const playHoverAudio = () => {
+        if(gameStarted){
+            playAudio("hoverSquare")
+        }
+    }
+
     return (
         <StyledSquare
             highlight={highlight}
@@ -35,7 +41,7 @@ const Square = memo(({
             onClick={onSquareClick}
             animate={animate}
             squareSize={squareSize}
-            onMouseEnter={() => { playAudio("hoverSquare") }}
+            onMouseEnter={playHoverAudio}
         ></StyledSquare>
     );
 });
