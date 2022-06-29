@@ -7,8 +7,9 @@ import {
   StyledOptions,
   StyledTitle,
 } from "./Home.styled";
-import { Zoom } from "@mui/material";
+import { Fade, Modal, Zoom } from "@mui/material";
 import { StatisticsContext } from "../../contexts/StatisticsContext";
+import Comandos from "../Comandos/Comandos";
 
 function Home() {
   console.log("RENDER - Home.");
@@ -16,6 +17,7 @@ function Home() {
   const { playAudio } = useContext(SoundContext);
   const navigate = useNavigate();
   const [showPlayOptions, setShowPlayOptions] = useState(false);
+  const [modal, setModal] = useState<string | null>(null);
   const { increment } = useContext(StatisticsContext);
 
   function quitApp() {
@@ -26,8 +28,8 @@ function Home() {
   }
 
   function onOptionClick(path: string = ".") {
-    if(path == "/game/player" || path == "/game/computer") {
-      playAudio('startGame');
+    if (path == "/game/player" || path == "/game/computer") {
+      playAudio("startGame");
     } else {
       playAudio("select");
     }
@@ -36,6 +38,14 @@ function Home() {
 
   function navigateTo(path: string, options = {}) {
     navigate(path, options);
+  }
+
+  function openModal(modal: string | null) {
+    setModal(modal);
+  }
+
+  function closeModal() {
+    setModal(null);
   }
 
   return (
@@ -81,6 +91,12 @@ function Home() {
               </StyledOption>
               <StyledOption
                 onMouseEnter={() => playAudio("hover")}
+                onClick={() => openModal("comandos")}
+              >
+                Comandos
+              </StyledOption>
+              <StyledOption
+                onMouseEnter={() => playAudio("hover")}
                 onClick={() => onOptionClick("/config")}
               >
                 Configurações
@@ -94,7 +110,18 @@ function Home() {
             </>
           )}
         </StyledOptions>
+      <> 
+        <Modal
+          open={modal == 'comandos'}
+          closeAfterTransition
+        >
+            <>
+              <Comandos closeModal={closeModal}></Comandos>
+            </>
+        </Modal>
+      </>
       </StyledContainer>
+
     </Zoom>
   );
 }

@@ -12,17 +12,15 @@ const ConfigurationContextProvider = ({ children }: any) => {
   const defaultConfiguration = {
     volumeEffects: 40,
     volumeMusic: 40,
-    showShips: false,
+    hideRulesModal: false
   }
 
   const firstRender = useRef(true);
   const [configuration, setConfiguration] = useImmer(defaultConfiguration);
   console.log('provider rendered again', configuration);
   
-  function saveConfig(callback: Function) {
-    setConfiguration(config => {
-      callback(config);
-    });
+  function saveConfig(configToSave: any) {
+    setConfiguration(config => ({...config, ...configToSave}));
   }
 
   useEffect(() => {
@@ -75,7 +73,7 @@ const ConfigurationContextProvider = ({ children }: any) => {
 
   return (
     // the Provider gives access to the context to its children
-    <ConfigurationContext.Provider value={{configuration, setConfiguration}}>
+    <ConfigurationContext.Provider value={{configuration, saveConfig}}>
       {/*<div style={{color: 'white'}}>{JSON.stringify(configuration)}</div>*/}
       {children}
     </ConfigurationContext.Provider>

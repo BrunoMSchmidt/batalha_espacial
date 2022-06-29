@@ -8,8 +8,8 @@ const os = require('os');
 let mainWindow;
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 720,
+    width: 1280,
+    height: 768,
     icon: __dirname + '/icon.png',
     webPreferences: {
       nodeIntegration: false,
@@ -17,8 +17,7 @@ function createWindow() {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.ts'),
     },
-    fullscreen: false, // true
-    frame: true,
+    fullscreen: true, // true
   });
 
   mainWindow.loadURL(
@@ -26,8 +25,6 @@ function createWindow() {
       ? 'http://localhost:3000'
       : `file://${path.join(__dirname, '../build/index.html')}`,
   );
-
-  mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', () => {
     mainWindow = null;

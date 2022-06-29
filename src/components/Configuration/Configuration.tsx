@@ -14,8 +14,7 @@ import ArrowBack from "@mui/icons-material/KeyboardBackspaceOutlined"
 
 const Configuration = () => {
   const navigate = useNavigate();
-  const {configuration, setConfiguration} =
-    useContext<any>(ConfigurationContext);
+  const {configuration, saveConfig} = useContext<any>(ConfigurationContext);
   const {control, handleSubmit} = useForm({
     defaultValues: {
       volumeMusic: configuration.volumeMusic || 0,
@@ -26,7 +25,7 @@ const Configuration = () => {
   console.log(control);
 
   function onSubmit(data: any) {
-    setConfiguration(data);
+    saveConfig(data);
   }
 
   function navigateBack(){

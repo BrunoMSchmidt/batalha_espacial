@@ -1,4 +1,4 @@
-import React, {memo, useContext, useEffect, useState} from 'react';
+import { memo, useContext } from 'react';
 import {Square as SquareType} from '../../types/types';
 import {StyledSquare} from "./Square.styled";
 import { GameDispatcherContext } from "../../contexts/GameContext";

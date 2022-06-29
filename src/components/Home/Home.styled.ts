@@ -18,7 +18,7 @@ const blinker = keyframes`
 
 export const StyledTitle = styled('h1')(({ theme }) => css`
   color: ${theme.palette.primary.main};
-  font-size: 80px;
+  font-size: 64px;
   font-family: ${theme.typography.fontFamily};
   cursor: default;
   user-select: none;
@@ -37,7 +37,7 @@ export const StyledOptions = styled('div')`
 
 export const StyledOption = styled('h2')(({ theme }) => `
   color: ${theme.palette.primary.main};
-  font-size: 80px;
+  font-size: 60px;
   margin: 0;
   text-decoration: none;
   cursor: pointer;

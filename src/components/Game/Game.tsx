@@ -1,5 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
-import * as gameHelper from "../../utils/gameHelper";
+import { useNavigate } from "react-router-dom";
 import SpaceShips from "../SpaceShips/SpaceShips";
 import Board from "../Board/Board";
 import {
@@ -79,7 +78,7 @@ function Game() {
       ? game.turn == "player2" || game.opponent == "computer"
         ? "Começar"
         : "Pronto"
-      : "Prosseguir";
+      : "Passar turno";
   };
 
   const getTitleText = () => {
@@ -93,8 +92,6 @@ function Game() {
   return (
     <>
       <Modal 
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
         open={!!game.gameWon}
         closeAfterTransition                
       >
